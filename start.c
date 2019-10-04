@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ORDEM 5
+#define ORDEM 6
 #define file "arvore.bin"
 
 typedef struct nodeBMais
@@ -149,31 +149,7 @@ void insereCodigo_inicio(int codigo, int pos_dado)
 
 void arruma_pai(FILE *arq, int pai, int nova_chave, int pos_esq, int pos_dir)
 {
-    noBmais *no_atual = (noBmais *)malloc(sizeof(noBmais));
-
-    no_atual = le_no_codigo(arq, pai);
-
-    //adiciona no pai independente se for ficar overflow
-
-    int i;
-    for (i = 0; i < no_atual->numChaves; i++)
-    {
-        if (nova_chave < no_atual->chave[i])
-            break;
-    }
-
-    no_atual->ponteiro[ORDEM + 1] = no_atual->ponteiro[ORDEM];
-
-    for (int j = (ORDEM); j >= i; j--)
-    {
-        no_atual->chave[j] = no_atual->chave[j - 1];
-        no_atual->chave[j] = no_atual->chave[j - 1];
-    }
-
-    no_atual->ponteiro[i] = pos_esq;
-    no_atual->ponteiro[i + 1] = pos_dir;
-
-    escreve_no_codigo(arq, no_atual, pai);
+    //TODO
 }
 
 int insereCodigo_termino(FILE *arq, int pai, int pos, int codigo, int pos_dado)
@@ -293,7 +269,6 @@ int insereCodigo_termino(FILE *arq, int pai, int pos, int codigo, int pos_dado)
                         new->ponteiro[b] = no_atual->ponteiro[b];
 
                         new->numChaves++;
-                        no_atual->numChaves--;
                     }
                     else
                     {
@@ -311,7 +286,7 @@ int insereCodigo_termino(FILE *arq, int pai, int pos, int codigo, int pos_dado)
 
                 for (b = 0, c = meio; b < ORDEM; b++, c++)
                 {
-                    if (b < meio)
+                    if (b <= meio)
                     {
                         no_atual->chave[b] = no_atual->chave[c];
                         no_atual->ponteiro[b] = no_atual->ponteiro[c];
@@ -323,6 +298,7 @@ int insereCodigo_termino(FILE *arq, int pai, int pos, int codigo, int pos_dado)
                         no_atual->ponteiro[b] = -1;
                     }
                 }
+                no_atual->numChaves = ORDEM - meio;
                 no_atual->ponteiro[ORDEM - 1] = no_atual->ponteiro[ORDEM];
                 no_atual->ponteiro[ORDEM] = -1;
 
@@ -334,7 +310,45 @@ int insereCodigo_termino(FILE *arq, int pai, int pos, int codigo, int pos_dado)
                 printf("NOVO NO :\n");
                 printa_no(new);
 
-                // == 4 - ARRUMAR O PAI OU CRIAR O PAI (CRIAR SOMENTE SE ESTIVER DANDO SPLIT NA RAIZ) == //
+                // == 4 - ESCREVER O FILHO ATUAL NA SUA POSICAO RECEBIDA PELOS PARAMETROS NO ARQUIVO == //
+
+                escreve_no_codigo(arq, no_atual, pos);
+
+                // == 5 - ESCREVER O NOVO NO (NEW) EM UMA POSICAO LIVRE OU NO TOPO== //
+
+                Cabecalho_BMais *cab = (Cabecalho_BMais *)malloc(sizeof(Cabecalho_BMais));
+                cab = le_cabecalho_codigo(arq);
+
+                int pos_new;
+
+                if (cab->pos_livre != -1)
+                { //colocar ele na posicao livre
+                    pos_new = cab->pos_livre;
+                    noBmais *livre = (noBmais *)malloc(sizeof(noBmais));
+
+                    livre = le_no_codigo(arq, cab->pos_livre);
+
+                    cab->pos_livre = livre->eh_folha; //encadeamento de nos excluidos
+
+                    escreve_no_codigo(arq, new, pos_new);
+                    escreve_cabecalho_codigo(arq, cab);
+
+                    free(livre);
+                    free(cab);
+                }
+                else
+                { //colocar ele no topo
+                    pos_new = cab->pos_topo;
+
+                    cab->pos_topo++;
+
+                    escreve_no_codigo(arq, new, pos_new);
+                    escreve_cabecalho_codigo(arq, cab);
+
+                    free(cab);
+                }
+
+                // == 6 - ARRUMAR O PAI OU CRIAR O PAI (CRIAR SOMENTE SE ESTIVER DANDO SPLIT NA RAIZ) == //
 
                 if (pai != -1)
                 { // arruma o pai e retorna -1
@@ -346,6 +360,8 @@ int insereCodigo_termino(FILE *arq, int pai, int pos, int codigo, int pos_dado)
                 { //criar o pai , escreve ele e depois retona sua posicao
 
                     noBmais *no_pai = (noBmais *)malloc(sizeof(noBmais));
+                    Cabecalho_BMais *cab2 = (Cabecalho_BMais *)malloc(sizeof(Cabecalho_BMais));
+                    cab2 = le_cabecalho_codigo(arq);
 
                     no_pai->numChaves = 1;
                     no_pai->chave[0] = no_atual->chave[0]; //colocar o valor do meio anteriormente decidido na cabeca dessa pagina
@@ -360,14 +376,45 @@ int insereCodigo_termino(FILE *arq, int pai, int pos, int codigo, int pos_dado)
                         no_pai->ponteiro[b] = -1;
                     }
 
-                    no_pai->ponteiro[0] = 31231231;
                     no_pai->ponteiro[1] = pos;
+                    no_pai->ponteiro[0] = pos_new;
+
+                    int pos_pai;
+
+                    if (cab2->pos_livre != -1)
+                    { //colocar o no criado anteriormente na posicao livre
+                        pos_pai = cab2->pos_livre;
+                        noBmais *livre2 = (noBmais *)malloc(sizeof(noBmais));
+
+                        livre2 = le_no_codigo(arq, cab2->pos_livre);
+
+                        cab2->pos_livre = livre2->eh_folha; //encadeamento de nos excluidos
+
+                        escreve_no_codigo(arq, no_pai, pos_pai);
+                        escreve_cabecalho_codigo(arq, cab2);
+
+                        free(livre2);
+                        free(cab2);
+                    }
+                    else
+                    { //colocar o no criado anteriormente no top
+                        pos_pai = cab2->pos_topo;
+
+                        cab2->pos_topo++;
+
+                        escreve_no_codigo(arq, no_pai, pos_pai);
+                        escreve_cabecalho_codigo(arq, cab2);
+
+                        free(cab2);
+                    }
 
                     printf("PAI NO :\n");
                     printa_no(no_pai);
-                }
 
-                return pos;
+                    free(no_pai);
+
+                    return pos_pai;
+                }
             }
             else
             { //folha perfeita para adicionar
@@ -397,123 +444,7 @@ int insereCodigo_termino(FILE *arq, int pai, int pos, int codigo, int pos_dado)
         }
         else
         { //navegue ate mais baixo
-            int i;
-
-            for (i = 0; i < no_atual->numChaves; i++)
-            {
-                if (codigo < no_atual->chave[i])
-                    break;
-            }
-
-            int resposta = insereCodigo_termino(arq, pos, no_atual->ponteiro[i], codigo, pos_dado);
-
-            if (resposta != -1)
-            { // esse no voltou normal
-                no_atual->ponteiro[i] = resposta;
-                escreve_no_codigo(arq, no_atual, pos);
-
-                return pos;
-            }
-            else
-            { //esse no foi atualizado , leia ele dnv ,
-                //se o no atual tiver overflow arrume ele e devolva -1
-                //se nao tiver overflow devolva a posicao atual
-
-                no_atual = le_no_codigo(arq, pos);
-
-                if (no_atual->numChaves <= ORDEM - 1) //nao tem overflow
-                {
-                    return pos;
-                }
-                else
-                { //tem overflow
-
-                    int i = 0;
-
-                    for (i = 0; i < ORDEM - 1; i++)
-                    { //para quando acahar a posicao que deve adicionar o novo codigo
-                        if (codigo < no_atual->chave[i])
-                            break;
-                    }
-
-                    int j = 0;
-
-                    no_atual->ponteiro[ORDEM + 1] = no_atual->ponteiro[ORDEM]; //passar a referencia da folha irma para o ponteiro overflow
-
-                    for (j = ORDEM; j > i; j--) //colocar pra frente as casas que estao a frente da onde vai ser inserido
-                    {
-                        no_atual->chave[j] = no_atual->chave[j - 1];
-                        no_atual->chave[j] = no_atual->chave[j - 1];
-                    }
-
-                    no_atual->chave[j] = codigo; //colocar a nova chave na posicao idal
-                    no_atual->chave[j] = pos;    //colocar o novo ponteiro na posicao ideal
-
-                    noBmais *aux = (noBmais *)malloc(sizeof(noBmais));
-
-                    aux->ponteiro[ORDEM] = pos; //criando o encadeamento de folhas  irmas
-
-                    for (int y = 0; y < i - 1; y++) //copiar as chaves e ponteiros ate o meio-1 copiando o no_atual
-                    {
-                        aux->chave[y] = no_atual->chave[y];
-                        aux->ponteiro[y] = no_atual->ponteiro[y];
-                        aux->numChaves++;
-                        no_atual->numChaves--;
-                    }
-
-                    int k = 0;
-                    int c = 0;
-
-                    for (c = 0, k = i - 1; k < ORDEM; k++, c++)
-                    {
-                        no_atual->chave[c] = no_atual->chave[k + 1];
-                        no_atual->ponteiro[c] = no_atual->ponteiro[+1];
-                    }
-
-                    no_atual->ponteiro[c] = no_atual->ponteiro[k + 1]; //colocar o ultimo ponteiro que faltou no lugar certo
-
-                    //escrever no arquivo o no atual e o no criado
-                    Cabecalho_BMais *cab = (Cabecalho_BMais *)malloc(sizeof(Cabecalho_BMais));
-                    cab = le_cabecalho_codigo(arq);
-
-                    if (cab->pos_livre != -1)
-                    { //tem posicao livre;
-                        noBmais *livre = (noBmais *)malloc(sizeof(noBmais));
-                        livre = le_no_codigo(arq, cab->pos_livre); //pega a informacao do no livre
-                        int pos_livre = cab->pos_livre;            //guarda a posicao do no livre
-                        cab->pos_livre = livre->eh_folha;          //atualiza a lista de nos livres
-
-                        escreve_no_codigo(arq, no_atual, pos);
-                        escreve_no_codigo(arq, aux, pos_livre);
-                        escreve_cabecalho_codigo(arq, cab);
-
-                        free(aux);
-                        free(livre);
-                        free(cab);
-
-                        arruma_pai(arq, pai, no_atual->chave[i], pos_livre, pos);
-                    }
-                    else
-                    { //nao tem posicao livre
-
-                        int pos_topo = cab->pos_topo; //guarda a posicao do topo
-
-                        escreve_no_codigo(arq, no_atual, pos);
-                        escreve_no_codigo(arq, aux, cab->pos_topo);
-                        cab->pos_topo++;
-
-                        escreve_cabecalho_codigo(arq, cab);
-
-                        arruma_pai(arq, pai, no_atual->chave[i], pos_topo, pos);
-
-                        free(no_atual);
-                        free(aux);
-                        free(cab);
-                    }
-
-                    return -1;
-                }
-            }
+            //TODO
         }
     }
 }
@@ -613,21 +544,84 @@ void printa_conteudo()
     fclose(arq);
 }
 
+void printa_chaves(noBmais *aux)
+{
+
+    printf("[");
+    for (int i = 0; i < aux->numChaves; i++)
+    {
+
+        printf("%d", aux->chave[i]);
+        if (i < aux->numChaves - 1)
+        {
+            printf(",");
+        }
+    }
+    printf("]");
+}
+
+void printa_nivel(FILE *arq, int pos, int contagem)
+{
+    if (pos != -1)
+    {
+        noBmais *aux = (noBmais *)malloc(sizeof(noBmais));
+        aux = le_no_codigo(arq, pos);
+
+        if (contagem == 1)
+        {
+            printa_chaves(aux);
+            printf(" ");
+        }
+        else if (contagem > 1)
+        {
+            for (int i = 0; i < ORDEM; i++)
+            {
+                if (aux->ponteiro[i] != -1)
+                {
+                    printa_nivel(arq, aux->ponteiro[i], contagem - 1);
+                }
+            }
+        }
+
+        free(aux);
+    }
+}
+
+void printa_arvore()
+{
+    FILE *arq = fopen(file, "rb+");
+    Cabecalho_BMais *cab = (Cabecalho_BMais *)malloc(sizeof(Cabecalho_BMais));
+    cab = le_cabecalho_codigo(arq);
+
+    if (cab->pos_raiz != -1)
+    {
+        for (int i = 1; i < 3; i++)
+        {
+            printa_nivel(arq, cab->pos_raiz, i);
+            printf("\n");
+        }
+    }
+
+    fclose(arq);
+}
+
 int main()
 {
     system("clear");
 
     inicia_arvore();
     printa_conteudo();
-    insereCodigo_inicio(5, 5);
-    printa_conteudo();
-    insereCodigo_inicio(4, 4);
+    insereCodigo_inicio(1, 1);
     printa_conteudo();
     insereCodigo_inicio(2, 2);
     printa_conteudo();
     insereCodigo_inicio(3, 3);
+    printa_conteudo();
+    insereCodigo_inicio(4, 4);
     //printa_conteudo();
-    insereCodigo_inicio(1, 1);
-    /* insereCodigo_inicio(7, 1); */
-    //printa_conteudo();
+    insereCodigo_inicio(5, 5);
+    insereCodigo_inicio(6, 6);
+    printa_conteudo();
+
+    printa_arvore();
 }
