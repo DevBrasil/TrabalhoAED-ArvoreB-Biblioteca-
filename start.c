@@ -755,7 +755,7 @@ void printa_chaves(noBmais *aux, int pos)
         }
     }
     printf("]");
-    printf(" pos = %d ", pos);
+    /* printf(" pos = %d ", pos); */
 }
 
 void printa_nivel(FILE *arq, int pos, int contagem)
@@ -772,9 +772,9 @@ void printa_nivel(FILE *arq, int pos, int contagem)
         }
         else if (contagem > 1)
         {
-            for (int i = 0; i < ORDEM; i++)
+            for (int i = 0; i <= ORDEM; i++)
             {
-                if (aux->ponteiro[i] != -1)
+                if (aux->ponteiro[i] != -1 && i != ORDEM)
                 {
                     printa_nivel(arq, aux->ponteiro[i], contagem - 1);
                 }
@@ -793,7 +793,7 @@ void printa_arvore()
 
     if (cab->pos_raiz != -1)
     {
-        for (int i = 1; i < 3; i++)
+        for (int i = 1; i < 4; i++)
         {
             printa_nivel(arq, cab->pos_raiz, i);
             printf("\n");
@@ -842,9 +842,9 @@ int main()
     printa_arvore();
     insereCodigo_inicio(90, 6);
     printa_arvore();
-    /*  insereCodigo_inicio(75, 6);
+    insereCodigo_inicio(85, 6);
     printa_arvore();
-    insereCodigo_inicio(75, 6);
+    /* insereCodigo_inicio(75, 6);
     printa_arvore(); */
 
     //printa_arvore();
