@@ -281,6 +281,7 @@ int insereCodigo_termino(FILE *arq, int pai, int pos, int codigo, int pos_dado)
 
                 new->eh_folha = no_atual->eh_folha;
                 new->pai = pai;
+                new->numChaves = 0;
 
                 int b;
 
@@ -484,7 +485,6 @@ int insereCodigo_termino(FILE *arq, int pai, int pos, int codigo, int pos_dado)
 
                     new->eh_folha = no_atual->eh_folha;
                     new->pai = pai;
-                    new->numChaves = 1;
 
                     int b;
 
@@ -573,7 +573,6 @@ int insereCodigo_termino(FILE *arq, int pai, int pos, int codigo, int pos_dado)
                     { // arruma o pai e retorna -1
 
                         arruma_pai(arq, pai, no_atual->chave[0], pos_new, pos);
-
                         return -1;
                     }
                     else
