@@ -122,7 +122,7 @@ aux= le_no_codigo(arq, cab->pos_raiz);
     aux=le_no_codigo(arq,aux->ponteiro[0]);
   }
   
-  while(aux->ponteiro[ORDEM]){
+  while(aux->ponteiro[ORDEM] != -1){
 
     
    for(int j=0;j<aux->numChaves; j++){
