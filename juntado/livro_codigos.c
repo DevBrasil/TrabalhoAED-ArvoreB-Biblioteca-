@@ -21,7 +21,7 @@ typedef struct Cabecalho_BMais
     int pos_livre;
 } Cabecalho_BMais;
 
-Cabecalho_BMais *le_cabecalho_codigo(FILE *arq)//ok
+Cabecalho_BMais *le_cabecalho_codigo(FILE *arq) //ok
 {
     Cabecalho_BMais *cab = (Cabecalho_BMais *)malloc(sizeof(Cabecalho_BMais));
     fseek(arq, 0, SEEK_SET); // posiciona no in ́ıcio do arquivo
@@ -29,7 +29,7 @@ Cabecalho_BMais *le_cabecalho_codigo(FILE *arq)//ok
     return cab;
 }
 
-noBmais *le_no_codigo(FILE *arq, int pos)//ok
+noBmais *le_no_codigo(FILE *arq, int pos) //ok
 {
     noBmais *x = malloc(sizeof(noBmais));
     fseek(arq, sizeof(Cabecalho_BMais) + pos * sizeof(noBmais), SEEK_SET);
@@ -37,20 +37,20 @@ noBmais *le_no_codigo(FILE *arq, int pos)//ok
     return x;
 }
 
-void escreve_cabecalho_codigo(FILE *arq, Cabecalho_BMais *cab)//ok
+void escreve_cabecalho_codigo(FILE *arq, Cabecalho_BMais *cab) //ok
 {
     fseek(arq, 0, SEEK_SET); //posiciona no in ́ıcio do arquivo
     fwrite(cab, sizeof(Cabecalho_BMais), 1, arq);
 }
 
-void escreve_no_codigo(FILE *arq, noBmais *x, int pos)//ok
+void escreve_no_codigo(FILE *arq, noBmais *x, int pos) //ok
 {
     fseek(arq, sizeof(Cabecalho_BMais) + pos * sizeof(noBmais), SEEK_SET);
     fwrite(x, sizeof(noBmais), 1, arq);
 }
 
 //verifica se o codigo existe na arvore
-int existe_codigo(int codigo)//ok
+int existe_codigo(int codigo) //ok
 {
     FILE *arq = fopen(file, "rb+");
     Cabecalho_BMais *cab = (Cabecalho_BMais *)malloc(sizeof(Cabecalho_BMais));
@@ -128,7 +128,7 @@ int retorna_pos_dado(int codigo)
 }
 
 //Inicia o a operacao de insercao do codigo
-void insereCodigo_inicio(int codigo, int pos_dado)//ok
+void insereCodigo_inicio(int codigo, int pos_dado) //ok
 {
     FILE *arq = fopen(file, "rb+");
 
@@ -1065,7 +1065,7 @@ void excluiCodigo_inicio(int codigo)
     fclose(arq);
 }
 
-void printa_no(noBmais *no, int pos)//ok
+void printa_no(noBmais *no, int pos) //ok
 {
     printf("[");
     for (int i = 0; i < no->numChaves; i++)
@@ -1092,7 +1092,7 @@ void printa_no(noBmais *no, int pos)//ok
 
     printf("]");
 
-    /* if (no->eh_folha != 1)
+    if (no->eh_folha == 1)
     {
         printf(" Suns= [");
         for (int i = 0; i < ORDEM + 1; i++)
@@ -1124,10 +1124,10 @@ void printa_no(noBmais *no, int pos)//ok
     else
     {
         printf(" pos = %d ", pos);
-    } */
+    }
 }
 
-void inicia_arvore()//ok
+void inicia_arvore() //ok
 {
     FILE *arq = fopen(file, "wb+");
 
@@ -1143,7 +1143,7 @@ void inicia_arvore()//ok
     fclose(arq);
 }
 
-void printa_chaves(noBmais *aux, int pos)//ok
+void printa_chaves(noBmais *aux, int pos) //ok
 {
 
     printf("[");
@@ -1160,7 +1160,7 @@ void printa_chaves(noBmais *aux, int pos)//ok
     printf(" pos = %d ", pos);
 }
 
-void printa_nivel(FILE *arq, int pos, int contagem)//ok
+void printa_nivel(FILE *arq, int pos, int contagem) //ok
 {
     if (pos != -1)
     {
@@ -1188,7 +1188,7 @@ void printa_nivel(FILE *arq, int pos, int contagem)//ok
     }
 }
 
-void printa_arvore()//OK
+void printa_arvore() //OK
 {
     FILE *arq = fopen(file, "rb+");
     Cabecalho_BMais *cab = (Cabecalho_BMais *)malloc(sizeof(Cabecalho_BMais));
@@ -1236,4 +1236,3 @@ int link_folhas(FILE *arq, int pos, int link_position)
         return response;
     }
 }
-
