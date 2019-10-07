@@ -24,7 +24,7 @@ char *remover_espacos_frase(char *s)
 void adiciona_livro(Dados_Livro livro)
 {
 
-  insere_codigo(livro.codigo);
+  insere_codigo(livro.codigo);//chama  a funcao para adicionar o livro
 
   int posicao;
   FILE *arq_livro = fopen("bd.bin", "rb+");
