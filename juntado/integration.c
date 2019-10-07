@@ -105,7 +105,7 @@ void exclui_livro()
 void imprime_em_ordem_de_codigo()
 {
 
-  FILE *arq;
+  FILE *arq = fopen("bdcodigos.bin", "rb+");
   Cabecalho_BMais *cab = (Cabecalho_BMais *)malloc(sizeof(Cabecalho_BMais));
   cab = le_cabecalho_codigo(arq);
 
