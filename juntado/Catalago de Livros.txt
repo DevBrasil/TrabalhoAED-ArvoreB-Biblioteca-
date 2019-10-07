@@ -1,0 +1,10 @@
+Código: 20 Possui: 3 Unidade(s). Livro:  Princ ́ıpios e Pr ́aticas de Programa ̧c~ao com C++ escrito por:  Bjarne Stroustrup
+Código: 150 Possui: 11 Unidade(s). Livro:  Sapiens: uma breve hist ́oria da humanidade escrito por: Yuval Harari
+Código: 10 Possui: 2 Unidade(s). Livro:  Progra mming in Prolog escrito por:  W. Clocksin
+Código: 30 Possui: 2 Unidade(s). Livro: As Brumas de Aval on escrito por:  Marion Zimmer Bradley
+Código: 6 Possui: 7 Unidade(s). Livro: Mem ́orias P ́ostum as de Br ́as Cubas escrito por: Joaquim Maria Machado de Assis
+Código: 111 Possui: 5 Unidade(s). Livro: Memorial de Maria Moura escrito por:  Rachel de Queiroz
+Código: 45 Possui: 3 Unidade(s). Livro: O Disc urso do M ́etodo escrito por:  Ren ́e Descartes
+Código: 70 Possui: 5 Unidade(s). Livro: O Senhor dos An eis escrito por:  J. R. R. Tolkien
+Código: 90 Possui: 4 Unidade(s). Livro: Primv eiras Est ́orias escrito por:  Jo~ao Guimar~aes Rosa
+Código: 200 Possui: 7 Unidade(s). Livro: Ulisses escrito por:  James Joyce
