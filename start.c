@@ -923,6 +923,17 @@ void pega_emprestado_esq(FILE *arq, int pos_pai, int pos, int chave)
 
     noBmais *filhodir = (noBmais *)malloc(sizeof(noBmais));
     filhodir = le_no_codigo(arq, pos);
+
+    pai->chave[i] = filhoesq->chave[filhoesq->numChaves - 1];
+    filhodir->chave[0] = filhoesq->chave[filhoesq->numChaves - 1];
+
+    filhoesq->chave[filhoesq->numChaves - 1] = -1;
+
+    filhoesq->numChaves--;
+
+    escreve_no_codigo(arq, pai, pos_pai);
+    escreve_no_codigo(arq, filhodir, pos);
+    escreve_no_codigo(arq, filhoesq, pai->ponteiro[i]);
 }
 
 int excluiCodigo_termino(FILE *arq, int pai, int pos, int codigo)
@@ -965,7 +976,28 @@ int excluiCodigo_termino(FILE *arq, int pai, int pos, int codigo)
 
             if (irmao_esq_pode_doar(arq, pai, no_atual->chave[0]) == 1)
             {
-                pega_emprestado_esq(arq, pai, pos, no_atual->chave[0]);
+                int i;
+                for (i = 0; codigo != no_atual->chave[i]; i++)
+                {
+                }
+
+                int b;
+
+                no_atual->chave[b] = -1;
+                no_atual->ponteiro[b] = -1;
+
+                for (b = 0; b < ORDEM - 2; b++)
+                {
+                    if (b < i)
+                    {
+                        no_atual->chave[b + 1] = no_atual->chave[b];
+                        no_atual->ponteiro[b] = no_atual->ponteiro[b];
+                    }
+                }
+
+                escreve_no_codigo(arq, no_atual, pos);
+
+                //pega_emprestado_esq(arq, pai, pos, no_atual->chave[0]);
             }
             else if (irmao_dir_pode_doar(arq, pai, no_atual->chave[0]) == 1)
             {
@@ -1231,11 +1263,8 @@ int main()
     insereCodigo_inicio(1, 10);
     printa_arvore();
     excluiCodigo_inicio(14);
-    insereCodigo_inicio(21, 10);
-    excluiCodigo_inicio(2);
+    printa_arvore();
     excluiCodigo_inicio(7);
-
-    printf("\n%d\n", pos_dado(7));
     /* excluiCodigo_inicio(80);
     excluiCodigo_inicio(44); */
     /*   insereCodigo_inicio(50, 10);
