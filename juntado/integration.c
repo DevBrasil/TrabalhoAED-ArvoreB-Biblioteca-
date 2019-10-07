@@ -6,6 +6,7 @@
 #include "livros_dados.h"
 
 
+
 char *remover_espacos_frase(char *s)
 {
     int n = 0;
@@ -23,42 +24,32 @@ char *remover_espacos_frase(char *s)
 
 void adiciona_livro(Dados_Livro livro)
 {
-
-  insere_codigo(livro.codigo);//chama  a funcao para adicionar o livro
-
   int posicao;
   FILE *arq_livro = fopen("bd.bin", "rb+");
   posicao = insere_livro(arq_livro, livro);
   fclose(arq_livro);
-
-  FILE *arquivo_codigo = fopen("bdcodigos.bin", "rb+");                       //Insere dados do livro
-  adiciona_posicao_do_livro_no_codigo(arquivo_codigo, posicao, livro.codigo); //adiciona a posicao dos dados do livro
-  fclose(arquivo_codigo);
+  insereCodigo_inicio(livro.codigo, posicao);//adiciona na arvore B com a posiçao do livro
 }
 
 void adiciona_livro_entradas()
 {
   printf("\n \t Adicionar Livro\n\n");
 
-  FILE *arquivo_codigo = fopen("bdcodigos.bin", "rb+");
 
   Dados_Livro livro;
-
-  Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
-  cab = le_cabecalho_codigos(arquivo_codigo);
 
   int aux_codigo, aux = 0;
   printf("Insira um codigo: ");
   scanf("%d", &aux_codigo);
 
-  aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz);
-
+  aux = existe_codigo(aux_codigo);
+printf("%d", aux);
   while (aux == 1)
   {
     printf("\nCodigo existente!!");
     printf("\nInsira um codigo novamente: ");
     scanf("%d", &aux_codigo);
-    aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz);
+    aux = existe_codigo(aux_codigo);
   }
   livro.codigo = aux_codigo;
 
@@ -73,12 +64,12 @@ void adiciona_livro_entradas()
   printf("\nInsira o numero de exemplares: ");
   scanf("%d", &livro.exemplares);
 
-  fclose(arquivo_codigo);
+  
 
   adiciona_livro(livro);
   printf("Livro cadastrado com sucesso!\n");
 }
-
+ /*
 void exclui_livro()
 {
 
@@ -113,29 +104,36 @@ void exclui_livro()
 
   free(cab);
 }
-
-void imprime_em_ordem_de_codigo(FILE *arq, int pos)
+*/
+void imprime_em_ordem_de_codigo()
 {
+  printf("INICIO FUNCAO");
+FILE *arq;
+  arq = fopen("bdcodigos.bin", "rb+");
+  Cabecalho_BMais *cab = (Cabecalho_BMais *)malloc(sizeof(Cabecalho_BMais));
+    cab = le_cabecalho_codigo(arq);
 
-  No_Codigo *no = (No_Codigo *)malloc(sizeof(No_Codigo));
-  no = le_no_codigo(arq, pos);
+noBmais *aux = (noBmais*) malloc(sizeof(noBmais));
+printf("ANTES WHILE");
+aux= le_no_codigo(arq, cab->pos_raiz);
 
-  if (no->esquerda != -1)
-  {
-    imprime_em_ordem_de_codigo(arq, no->esquerda);
+  while(aux->eh_folha!=1){
+    printf("DENTRO WHILE");
+    aux=le_no_codigo(arq,aux->ponteiro[0]);
   }
+  
+  while(aux->ponteiro[ORDEM]){
 
-  if (no->pos_livro != -2)
-  {
-    imprime_livro(no->pos_livro);
-  }
+    
+   for(int j=0;j<aux->numChaves; j++){
 
-  if (no->direita != -1)
-  {
-    imprime_em_ordem_de_codigo(arq, no->direita);
-  }
+     imprime_livro(aux->ponteiro[j]);
+   }
+   aux = le_no_codigo(arq,aux->ponteiro[ORDEM]);
+ }
+fclose(arq);
 }
-
+/*
 void livros_ordenados_por_codigo()
 {
   FILE *arq = fopen("bdcodigos.bin", "rb+");
@@ -153,16 +151,15 @@ void livros_ordenados_por_codigo()
 
   fclose(arq);
 }
-
+*/
 void atualizar_exmplares()
 {
   printf("\n \t Atualizar exemplares \n\n");
 
-  FILE *arquivo_codigo;
-  arquivo_codigo = fopen("bdcodigos.bin", "rb+");
-
-  Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
-  cab = le_cabecalho_codigos(arquivo_codigo);
+  FILE *arq;
+  arq = fopen("bdcodigos.bin", "rb+");
+  Cabecalho_BMais *cab = (Cabecalho_BMais *)malloc(sizeof(Cabecalho_BMais));
+    cab = le_cabecalho_codigo(arq);
 
   if (cab->pos_raiz == -1)
   {
@@ -171,23 +168,29 @@ void atualizar_exmplares()
   else
   {
     int aux = 1;
-    Codigo aux_codigo;
+    int aux_codigo;
 
     printf("\nInsira um codigo: ");
     scanf("%d", &aux_codigo);
 
-    aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
-    if (aux == 0)
-    {
-      printf("Livro nao existente no sistema\n");
-    }
-    else
-    {
-      int posicao = posicao_do_livro(arquivo_codigo, cab->pos_raiz, aux_codigo);
+
+  aux = existe_codigo(aux_codigo);
+  
+  while (aux != 1)
+  {
+    printf("\nCodigo nao existente!!");
+    printf("\nInsira um codigo novamente: ");
+    scanf("%d", &aux_codigo);
+    aux = existe_codigo(aux_codigo);
+  }
+  
+      int posicao = retorna_pos_dado(aux_codigo);
 
       FILE *teste2;
       teste2 = fopen("bd.bin", "rb+");
-      imprime_livro(posicao);
+
+      imprime_livro(posicao);//retorna dados do livro
+
       No_livro *livro = (No_livro *)malloc(sizeof(No_livro));
       livro = le_no_livro(teste2, posicao);
 
@@ -198,20 +201,21 @@ void atualizar_exmplares()
 
       fclose(teste2);
     }
+    fclose(arq);
   }
 
-  fclose(arquivo_codigo);
-}
+  
+
 
 void buscar_dados_do_livro()
 {
   printf("\n \t Buscar dados do Livro\n\n");
 
-  FILE *arquivo_codigo;
-  arquivo_codigo = fopen("bdcodigos.bin", "rb+");
+  FILE *arq;
+  arq = fopen("bdcodigos.bin", "rb+");
+ Cabecalho_BMais *cab = (Cabecalho_BMais *)malloc(sizeof(Cabecalho_BMais));
+    cab = le_cabecalho_codigo(arq);
 
-  Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
-  cab = le_cabecalho_codigos(arquivo_codigo);
 
   if (cab->pos_raiz == -1)
   {
@@ -221,12 +225,12 @@ void buscar_dados_do_livro()
   {
 
     int aux = 1;
-    Codigo aux_codigo;
+    int  aux_codigo;
 
     printf("\nInsira um codigo: ");
     scanf("%d", &aux_codigo);
 
-    aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
+    aux = existe_codigo(aux_codigo); //Insere o codigo dos livros
 
     if (aux == 0)
     {
@@ -234,7 +238,7 @@ void buscar_dados_do_livro()
     }
     else
     {
-      int posicao = posicao_do_livro(arquivo_codigo, cab->pos_raiz, aux_codigo);
+      int posicao = retorna_pos_dado(aux_codigo);
 
       FILE *teste2;
       teste2 = fopen("bd.bin", "rb+");
@@ -243,7 +247,7 @@ void buscar_dados_do_livro()
     }
   }
 
-  fclose(arquivo_codigo);
+  fclose(arq);
 }
 
 void inserir_via_arquivo_txt()
@@ -251,23 +255,23 @@ void inserir_via_arquivo_txt()
 
   Dados_Livro livro;
 
-  FILE *file;
-  file = fopen("dados.txt", "r");
+  FILE *file1;
+  file1 = fopen("dados.txt", "r");
 
   char type;
-  if (file == NULL)
+  if (file1 == NULL)
   {
     printf("Problemas na LEITURA do arquivo\n");
   }
   else
   {
     printf("ARQUIVO ABERTO COM SUCESSO LEITURA SENDO FEITA ...\n");
-    while (!feof(file))
+    while (!feof(file1))
     {
-      fscanf(file, "%d%*c", &livro.codigo);
-      fscanf(file, "%[^;]%*c", livro.titulo);
-      fscanf(file, "%[^;]%*c", livro.autor);
-      fscanf(file, "%d%*c", &livro.exemplares);
+      fscanf(file1, "%d%*c", &livro.codigo);
+      fscanf(file1, "%[^;]%*c", livro.titulo);
+      fscanf(file1, "%[^;]%*c", livro.autor);
+      fscanf(file1, "%d%*c", &livro.exemplares);
       *livro.autor = *remover_espacos_frase(livro.autor);
       *livro.titulo = *remover_espacos_frase(livro.titulo);
       adiciona_livro(livro);
@@ -275,5 +279,5 @@ void inserir_via_arquivo_txt()
   }
   printf("LEITURA FEITA COM SUCESSO\n");
 
-  fclose(file);
+  fclose(file1);
 }

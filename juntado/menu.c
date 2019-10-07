@@ -31,10 +31,8 @@ void menu_start()
     printf("3. Atualizar numero de exemplares de um livro\n");
     printf("4. Remover livro\n");
     printf("5. Buscar dados do livro\n");
-    printf("6. Imprimir arvore binaria\n");
-    printf("7. Imprimir arvore binaria por nıvel\n");
-    printf("8. Imprimir acervo\n");
-    printf("9. Gerar listagem de livros ordenados por tıtulo\n");
+    printf("6. Imprimir arvore B+\n");
+    printf("7. Imprimir acervo\n");
 
     printf("0. Sair\n");
     printf("----------------------------------------------\n");
@@ -59,7 +57,7 @@ void menu_start()
       break;
     case 4:
       ClearTerminal();
-      exclui_livro();
+    //  exclui_livro();
      
       break;
     case 5:
@@ -67,19 +65,11 @@ void menu_start()
       buscar_dados_do_livro();
       break;
     case 6:
-      imprime_tudo_notacao();
+    printa_arvore();
       break;
     case 7:
       ClearTerminal();
-      printa_arvore_por_nivel();
-      break;
-    case 8:
-      ClearTerminal();
-      livros_ordenados_por_codigo();
-      break;
-    case 9:
-      ClearTerminal();
-      gerarListagemporTitulo();
+      imprime_em_ordem_de_codigo();
       break;
     case 0:
       ClearTerminal();

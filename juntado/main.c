@@ -13,7 +13,7 @@ int main()
   FILE *codigos = fopen("bdcodigos.bin", "wb");
   FILE *dados = fopen("bd.bin", "wb+");
 
-  cria_arvore_vazia_codigo(codigos);
+  inicia_arvore();
   cria_lista_vazia(dados);
 
   fclose(codigos);

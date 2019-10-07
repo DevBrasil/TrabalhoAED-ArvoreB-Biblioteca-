@@ -20,17 +20,17 @@ void adiciona_livro_entradas();
 //Excluir um livro no arquivo de codigos e no de dados usando entradas por teclado
 //Pre-condicao: nenhuma
 //Pos-condicao: livro adicionado nos arquivos
-void exclui_livro();
+//void exclui_livro();
 
 //Imprime na telas a lista de livros ordenados por codigo
 //Pre-condicao: nenhuma
 //Pos-condicao: livro adicionado nos arquivos
-void imprime_em_ordem_de_codigo(FILE *arq, int pos);
+void imprime_em_ordem_de_codigo();
 
 //Imprime na telas a lista de livros ordenados por codigo
 //Pre-condicao: nenhuma
 //Pos-condicao: livro adicionado nos arquivos
-void livros_ordenados_por_codigo();
+//void livros_ordenados_por_codigo();
 
 //Atualiza o numero de exemplares de um livro
 //Pre-condicao: nenhuma
