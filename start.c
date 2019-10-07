@@ -837,105 +837,6 @@ int insereCodigo_termino(FILE *arq, int pai, int pos, int codigo, int pos_dado)
     }
 }
 
-int irmao_esq_pode_doar(FILE *arq, int pos, int ponteiro)
-{
-    noBmais *pai = (noBmais *)malloc(sizeof(noBmais));
-    pai = le_no_codigo(arq, pos);
-
-    if (ponteiro < pai->chave[0])
-    {
-        //nao tem fihos mais a esquerda
-
-        return -1;
-    }
-    else
-    {
-        int i = 0;
-        while (ponteiro > pai->chave[i])
-        {
-            i++;
-        }
-
-        noBmais *filho = (noBmais *)malloc(sizeof(noBmais));
-        filho = le_no_codigo(arq, pai->ponteiro[i]);
-
-        if (filho->numChaves > ORDEM / 2)
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-}
-
-int irmao_dir_pode_doar(FILE *arq, int pos, int ponteiro)
-{
-    noBmais *pai = (noBmais *)malloc(sizeof(noBmais));
-    pai = le_no_codigo(arq, pos);
-
-    if (ponteiro < pai->chave[0])
-    {
-        //nao tem fihos mais a esquerda
-
-        return -1;
-    }
-    else if (ponteiro >= pai->chave[pai->numChaves - 1])
-    {
-        return -1;
-    }
-    else
-    {
-        int i = 0;
-        while (ponteiro > pai->chave[i])
-        {
-            i++;
-        }
-
-        noBmais *filho = (noBmais *)malloc(sizeof(noBmais));
-        filho = le_no_codigo(arq, pai->ponteiro[i + 2]);
-
-        if (filho->numChaves > ORDEM / 2)
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-}
-
-void pega_emprestado_esq(FILE *arq, int pos_pai, int pos, int chave)
-{
-    noBmais *pai = (noBmais *)malloc(sizeof(noBmais));
-    pai = le_no_codigo(arq, pos_pai);
-
-    int i = 0;
-    while (chave > pai->chave[i])
-    {
-        i++;
-    }
-
-    noBmais *filhoesq = (noBmais *)malloc(sizeof(noBmais));
-    filhoesq = le_no_codigo(arq, pai->ponteiro[i]);
-
-    noBmais *filhodir = (noBmais *)malloc(sizeof(noBmais));
-    filhodir = le_no_codigo(arq, pos);
-
-    pai->chave[i] = filhoesq->chave[filhoesq->numChaves - 1];
-    filhodir->chave[0] = filhoesq->chave[filhoesq->numChaves - 1];
-
-    filhoesq->chave[filhoesq->numChaves - 1] = -1;
-
-    filhoesq->numChaves--;
-
-    escreve_no_codigo(arq, pai, pos_pai);
-    escreve_no_codigo(arq, filhodir, pos);
-    escreve_no_codigo(arq, filhoesq, pai->ponteiro[i]);
-}
-
 int excluiCodigo_termino(FILE *arq, int pai, int pos, int codigo)
 {
     noBmais *no_atual = (noBmais *)malloc(sizeof(noBmais));
@@ -973,36 +874,6 @@ int excluiCodigo_termino(FILE *arq, int pai, int pos, int codigo)
         }
         else
         { // pagina imperfeita
-
-            if (irmao_esq_pode_doar(arq, pai, no_atual->chave[0]) == 1)
-            {
-                int i;
-                for (i = 0; codigo != no_atual->chave[i]; i++)
-                {
-                }
-
-                int b;
-
-                no_atual->chave[b] = -1;
-                no_atual->ponteiro[b] = -1;
-
-                for (b = 0; b < ORDEM - 2; b++)
-                {
-                    if (b < i)
-                    {
-                        no_atual->chave[b + 1] = no_atual->chave[b];
-                        no_atual->ponteiro[b] = no_atual->ponteiro[b];
-                    }
-                }
-
-                escreve_no_codigo(arq, no_atual, pos);
-
-                //pega_emprestado_esq(arq, pai, pos, no_atual->chave[0]);
-            }
-            else if (irmao_dir_pode_doar(arq, pai, no_atual->chave[0]) == 1)
-            {
-                pega_emprestado_esq(arq, pai, pos, no_atual->chave[0]);
-            }
 
             return pos;
         }
@@ -1262,9 +1133,12 @@ int main()
     insereCodigo_inicio(7, 10);
     insereCodigo_inicio(1, 10);
     printa_arvore();
-    excluiCodigo_inicio(14);
+    excluiCodigo_inicio(80);
     printa_arvore();
-    excluiCodigo_inicio(7);
+    /* excluiCodigo_inicio(70);
+    printa_arvore(); */
+    /* excluiCodigo_inicio(7);
+    printa_arvore(); */
     /* excluiCodigo_inicio(80);
     excluiCodigo_inicio(44); */
     /*   insereCodigo_inicio(50, 10);
@@ -1292,7 +1166,7 @@ int main()
     insereCodigo_inicio(33, 10);
     insereCodigo_inicio(34, 10);
     insereCodigo_inicio(35, 10); */
-    printa_arvore();
+    //printa_arvore();
 
     /* insereCodigo_inicio(75, 6);
     printa_arvore(); */
